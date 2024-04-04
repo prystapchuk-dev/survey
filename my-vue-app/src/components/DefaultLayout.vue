@@ -45,7 +45,7 @@
             </div>
           </div>
         </div>
-  
+
         <DisclosurePanel class="md:hidden">
           <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             <router-link v-for="item in navigation" :key="item.name" as="a" :to="item.to" active-class="bg-gray-900 text-white" :class="[$router.name === item.to.name ? '' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']">{{ item.name }}</router-link>
@@ -71,20 +71,20 @@
           </div>
         </DisclosurePanel>
       </Disclosure>
-  
+
      <router-view></router-view>
     </div>
   </template>
-  
+
   <script setup>
   import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
   import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/vue/24/outline'
   import { useStore } from 'vuex';
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
-  
 
-  
+
+
   const navigation = [
     { name: 'Dashboard', to: { name: 'Dashboard' }},
     { name: 'Surveys', to: { name: 'Surveys'}},
@@ -97,7 +97,6 @@
     const user = computed(() => store.state.user.data);
 
   function logout() {
-    console.log('Helo');
     store.commit('logout');
     router.push({ name: 'Login'})
   }

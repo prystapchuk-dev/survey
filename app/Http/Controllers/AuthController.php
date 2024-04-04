@@ -18,8 +18,8 @@ class AuthController extends Controller
           'password' => [
             'required',
             'confirmed',
-            Password::min(2)->mixedCase()->numbers()->symbols()
-          ] 
+            Password::min(2)->numbers()
+          ]
         ]);
 
         $user = User::create([
@@ -39,7 +39,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
       $credentials = $request->validate([
-        'email' => 'required|email|string|exists:user,email',
+        'email' => 'required|email|string|exists:users,email',
         'password' => [
           'required',
         ],
