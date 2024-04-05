@@ -125,7 +125,7 @@
           </div>
           <div v-for="(question, index) in model.questions" :key="question.id">
             <QuestionEditor
-              :qustion="question"
+              :question="question"
               :index="index"
               @change="questionChange"
               @addQuestion="addQuestion"
@@ -166,7 +166,9 @@ let model = ref({
 if (route.params.id) {
   model.value = store.state.surveys.find(
     (s) => s.id === parseInt(route.params.id)
+
   );
+  console.log(model.value);
 }
 
 function saveSurvey() {
