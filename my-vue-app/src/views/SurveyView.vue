@@ -168,7 +168,6 @@ if (route.params.id) {
     (s) => s.id === parseInt(route.params.id)
 
   );
-  console.log(model.value);
 }
 
 function saveSurvey() {

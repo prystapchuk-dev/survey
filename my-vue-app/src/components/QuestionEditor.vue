@@ -105,9 +105,9 @@
         </button>
         <!--/ Add new option -->
       </h4>
-
+git
       <div
-        v-if="!model.questions.data.options.length"
+        v-if="!model.data.options.length"
         class="text-sm text-gray-600 text-center py-3"
       >
         Ви не маєте опцій
@@ -159,7 +159,7 @@ const props = defineProps({
 const emit = defineEmits(['change', 'addQuestion', 'deleteQuestion']);
 
 const model = ref(JSON.parse(JSON.stringify(props.question)));
-console.log(model.data.options);
+console.log(model);
 function shouldHaveQuestions() {
   return true;
 }

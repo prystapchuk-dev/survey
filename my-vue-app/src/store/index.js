@@ -74,8 +74,8 @@ const tmpSurveys = [
   },
   {
     id: 200,
-    title: 'The title',
-    slug: 'the-title',
+    title: 'The title2',
+    slug: 'the-title2',
     status: 'draft',
     image: 'https://media.istockphoto.com/id/496355826/fr/photo/kayak-en-arri%C3%A8re-plan.jpg?s=1024x1024&w=is&k=20&c=aEQ1jZ1CwArEfbrUARRqOFcMO66aSlT0ML-_bbIv4Zs=',
     description: 'The description',
