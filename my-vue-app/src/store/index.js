@@ -56,34 +56,52 @@ const tmpSurveys = [
           ],
         },
       },
-      {
-        id: 4,
-        type: 'text',
-        question: 'What your favorite',
-        description: null,
-        data: {},
-      },
-      {
-        id: 5,
-        type: 'textarea',
-        question: 'What your favorite',
-        description: null,
-        data: {},
-      },
     ],
   },
   {
     id: 200,
-    title: 'The title2',
-    slug: 'the-title2',
+    title: 'The title',
+    slug: 'the-title',
     status: 'draft',
-    image: 'https://media.istockphoto.com/id/496355826/fr/photo/kayak-en-arri%C3%A8re-plan.jpg?s=1024x1024&w=is&k=20&c=aEQ1jZ1CwArEfbrUARRqOFcMO66aSlT0ML-_bbIv4Zs=',
+    image: 'https://media.istockphoto.com/id/1942772853/fr/photo/a-group-of-friends-enjoying-in-the-sea.jpg?s=1024x1024&w=is&k=20&c=UkcMphlWzxX8XnpvLYhobEJcgiR-29Uv96vIG1er7BE=',
     description: 'The description',
     created_at: '2024-04-01 12:00:00',
     updated_at: '2024-04-02 12:00:00',
     expire_date: '2024-04-10 12:00:00',
     questions: [
+      {
+        id: 1,
+        type: 'select',
+        question: 'From which country are you?',
+        description: null,
+        data: {
+          options: [
 
+          ],
+        },
+      },
+      {
+        id: 2,
+        type: 'checkbox',
+        question: 'Which language videos do you?',
+        description: 'Lorem ipsum description',
+        data: {
+          options: [
+
+          ],
+        },
+      },
+      {
+        id: 3,
+        type: 'radio',
+        question: 'Which language videos do you?',
+        description: 'Lorem ipsum description',
+        data: {
+          options: [
+
+          ],
+        },
+      },
     ],
   },
 ];
@@ -94,18 +112,59 @@ const store = createStore({
       token: sessionStorage.getItem('TOKEN'),
     },
     surveys: [...tmpSurveys],
+    currentSurvey: {
+      loading: false,
+      data: {},
+    },
+    questionTypes: ['text', 'select', 'radio', 'checkbox', 'textarea'],
   },
   getters: {},
   actions: {
+    getSurvey({ commit }, id) {
+      commit('setCurrentSurveyLoading', true);
+      return axiosClient
+              .get(`/survey/${id}`)
+              .then((res) => {
+
+              commit('setCurrentSurvey', res.data);
+              commit('setCurrentSurveyLoading', false);
+              return res;
+            })
+            .catch((err) => {
+              commit('setCurrentSurveyLoading', false);
+              throw err;
+            });
+    },
+    saveSurvey({ commit }, survey) {
+      delete survey.image_url;
+      let response;
+      if(survey.id) {
+        response = axiosClient
+          .put(`/survey/${survey.id}`, survey)
+          .then((res) => {
+            commit('setCurrentSurvey', res.data);
+            return res;
+          });
+      } else {
+        response = axiosClient
+          .post('/survey', survey)
+          .then((res) => {
+            commit('setCurrentSurvey', res.data);
+            return res;
+          });
+      }
+      return response;
+      console.log(response);
+    },
     register({ commit }, user) {
-      return axiosClient.post('http://localhost:8000/api/register', user)
+      return axiosClient.post('/register', user)
         .then(({data}) => {
           commit('setUser', data)
           return data;
         })
     },
     login({ commit }, user) {
-      return axiosClient.post('http://localhost:8000/api/login', user)
+      return axiosClient.post('/login', user)
         .then(({data}) => {
           commit('setUser', data)
           return data;
@@ -113,6 +172,23 @@ const store = createStore({
     },
   },
   mutations: {
+    setCurrentSurveyLoading: (state, loading) => {
+      state.currentSurvey.loading = loading;
+    },
+    setCurrentSurvey: (state, survey) => {
+      state.currentSurvey.data = survey;
+    },
+    saveSurvey: (state, survey) => {
+      state.surveys = [...state.surveys, survey.data];
+    },
+    updateSurvey: (state, survey) => {
+      state.surveys = state.surveys.map((s) => {
+        if(s.id == survey.data.id) {
+          return survey.data;
+        }
+        return s;
+      });
+    },
     logout: state => {
       state.user.data = {};
       state.user.token = null;

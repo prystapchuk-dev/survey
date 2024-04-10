@@ -3,12 +3,25 @@
     <template v-slot:header>
       <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold text-gray-900">
-          {{ model.id ? model.title : 'Створити опитування' }}
+          {{ route.params.id ? model.title : 'Створити опитування' }}
         </h1>
+        <button v-if="route.params.id"
+          type="button"
+          @click="deleteSurvey()"
+          class="py-2 px-3 text-white bg-red-500 rounded-md hover:bg-red-600"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline-block">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+          </svg>
+          Видалити
+        </button>
       </div>
     </template>
   </PageComponent>
-  <form @submit.prevent="saveSurvey" method="post">
+  <div v-if="surveyLoading" class="flex justify-center text-zinc-800">Запитання....</div>
+  <form v-else @submit.prevent="saveSurvey" method="post">
+
+   <pre> {{ model }} </pre>
     <div class="shadow sm:rounded-md sm:overflow-hidden">
       <!--/ Survey Fields -->
       <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
@@ -19,8 +32,8 @@
           </label>
           <div class="mt-1 flex items-center">
             <img
-              v-if="model.image"
-              :src="model.image"
+              v-if="model.image_url"
+              :src="model.image_url"
               :alt="model.title"
               class="w-64 h-48 object-cover"
             />
@@ -35,6 +48,7 @@
                     class="relative overflow-hidden ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               <input
                 type="file"
+                @change="onImageChoose"
                 class="absolute left-0 top-0 right-0 bottom-0 opacity-0 cursor-pointer"
               >
               Змінити
@@ -120,7 +134,7 @@
             </button>
             <!--/ Add new question -->
           </h3>
-          <div v-if="!model.questions.length" class="text-center text-gray-600">
+          <div v-if="!model.questions" class="text-center text-gray-600">
             Ви не маєте створених запитань
           </div>
           <div v-for="(question, index) in model.questions" :key="question.id">
@@ -148,29 +162,94 @@
 <script setup>
 import PageComponent from "../components/PageComponent.vue";
 import QuestionEditor from "../components/QuestionEditor.vue";
-import { ref } from "vue";
-import {useRoute} from "vue-router";
-import store from "../store/index.js";
+import { computed, ref, watch } from "vue";
+import { useRouter, useRoute} from "vue-router";
+import store from "../store";
+import { v4 as uuidv4 } from "uuid";
 
+const router = useRouter();
 const route = useRoute();
+
+const surveyLoading = computed(() => store.state.currentSurvey.loading);
 
 let model = ref({
   title: '',
   status: false,
   description: null,
-  image: null,
+  image_url: null,
   expire_date: null,
   questions: [],
 });
 
-if (route.params.id) {
-  model.value = store.state.surveys.find(
-    (s) => s.id === parseInt(route.params.id)
+watch(
+  () => store.state.currentSurvey.data.data,
+  (newVal, oldVal) => {
 
-  );
+    model.value = {
+      ...JSON.parse(JSON.stringify(newVal)),
+      status: !!newVal.status,
+    };
+  }
+);
+
+if (route.params.id) {
+store.dispatch('getSurvey', route.params.id);
+}
+
+function onImageChoose(ev) {
+  const file = ev.target.files[0];
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    model.value.image = reader.result;
+
+    model.value.image_url = reader.result;
+  }
+  reader.readAsDataURL(file);
+}
+
+function addQuestion(index) {
+  const newQuestion = {
+    id: uuidv4(),
+    type: 'text',
+    question: '',
+    description: null,
+    data: {},
+  };
+
+  model.value.questions.splice(index, 0, newQuestion);
+}
+
+function deleteQuestion(question) {
+  model.value.questions = model.value.questions.filter(
+    (que) => que !== question
+    );
+}
+
+function questionChange(question) {
+  model.value.questions = model.value.questions.map((q) => {
+    if(q.id === question.id) {
+      return JSON.parse(JSON.stringify(question));
+    }
+    return q;
+  });
 }
 
 function saveSurvey() {
-console.log('fsdf');
+  store.dispatch("saveSurvey", model.value).then(({data}) => {
+
+    router.push({
+      name: "SurveyView",
+      params: { id: data.data.id },
+    });
+  });
+}
+
+function deleteSurvey() {
+  if(confirm('Ви дійсно хочете назавжди видалити опитування?')) {
+    store.dispatch('deleteSurvey', model.value.id);
+    }
+
 }
 </script>

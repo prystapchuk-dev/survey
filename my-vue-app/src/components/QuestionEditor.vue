@@ -64,7 +64,7 @@
         @change="typeChange"
         class="mt-1 block w-full py-2 px-3 sm:text-sm border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
         <option v-for="type in questionTypes" :key="type" :value="type">
-          {{ upperCaseFirst(type) }}
+          {{ capitalize(type) }}
         </option>
       </select>
     </div>
@@ -89,7 +89,7 @@
 
   <!-- Data -->
   <div>
-    <div v-if="shouldHaveQuestions()" class="mt-2">
+    <div v-if="shouldHaveOptions()" class="mt-2">
       <h4 class="text-sm font-semibold mb-1 flex justify-between items-center">
         Опції
 
@@ -105,7 +105,6 @@
         </button>
         <!--/ Add new option -->
       </h4>
-git
       <div
         v-if="!model.data.options.length"
         class="text-sm text-gray-600 text-center py-3"
@@ -149,7 +148,9 @@ git
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, capitalize } from "vue";
+import  store  from "../store";
+import { v4 as uuidv4 } from "uuid";
 
 const props = defineProps({
   question: Object,
@@ -159,9 +160,61 @@ const props = defineProps({
 const emit = defineEmits(['change', 'addQuestion', 'deleteQuestion']);
 
 const model = ref(JSON.parse(JSON.stringify(props.question)));
-console.log(model);
-function shouldHaveQuestions() {
-  return true;
+
+const questionTypes = computed(()=>store.state.questionTypes);
+
+function shouldHaveOptions() {
+  return ['select', 'radio', 'checkbox'].includes(model.value.type);
 }
+
+function getOptions() {
+  return model.value.data.options;
+}
+
+function setOptions(options) {
+  return model.value.data.options = options;
+
+}
+
+
+function addOption() {
+  setOptions([
+    ...getOptions(),
+    { uuid: uuidv4(), text: '' },
+  ]);
+  dataChange();
+}
+
+function removeOption(option) {
+  setOptions(getOptions().filter(
+    (opt) => opt !== option
+  ));
+  dataChange();
+}
+
+function typeChange() {
+  if(shouldHaveOptions()) {
+    setOptions(getOptions() || []);
+  }
+  dataChange();
+}
+
+function dataChange() {
+  const data = JSON.parse(JSON.stringify(model.value));
+  if(!shouldHaveOptions()) {
+    delete data.data.options;
+  }
+
+  emit('change', data);
+}
+
+function addQuestion() {
+  emit('addQuestion', props.index + 1);
+}
+
+function deleteQuestion() {
+  emit('deleteQuestion', props.question);
+}
+
 </script>
 
