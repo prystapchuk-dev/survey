@@ -18,7 +18,7 @@
       </div>
     </template>
   </PageComponent>
-  <div v-if="surveyLoading" class="flex justify-center text-zinc-800">Запитання....</div>
+  <div v-if="surveyLoading" class="flex justify-center text-zinc-800">Завантаження....</div>
   <form v-else @submit.prevent="saveSurvey" method="post">
 
    <pre> {{ model }} </pre>
@@ -248,7 +248,10 @@ function saveSurvey() {
 
 function deleteSurvey() {
   if(confirm('Ви дійсно хочете назавжди видалити опитування?')) {
-    store.dispatch('deleteSurvey', model.value.id);
+    store.dispatch('deleteSurvey', model.value.id)
+      .then(() => {
+        router.push({ name: 'Surveys' });
+      });
     }
 
 }

@@ -14,11 +14,12 @@
         </router-link>
       </div>
     </template>
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+    <div v-if="surveys.surveysLoading" class="flex justify-center text-zinc-800">Завантаження....</div>
+    <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
       <div v-for="survey in surveys"
             :key="survey.id"
             class="flex flex-col py-4 px-6 shadow-md bg-white hover:bg-gray-50 h-[470px] rounded-md">
-        <img :src="survey.image" alt="" class="w-full h-48 object-cover">
+        <img :src="survey.image_url" alt="" class="w-full h-48 object-cover">
         <h4 class="mt-4 text-lg font-bold">{{ survey.title }}</h4>
         <div v-html="survey.description" class="overflow-hidden flex-1"></div>
         <div class="flex justify-between items-center mt-3">
@@ -49,7 +50,11 @@ import PageComponent from '../components/PageComponent.vue';
 import store from "../store";
 import { computed  } from "vue";
 
-const surveys = computed(() => store.state.surveys);
+const surveys = computed(() => store.state.surveys.data);
+
+
+
+store.dispatch('getSurveys');
 
 function deleteSurvey(survey) {
   if (confirm('Ви впевнені?')) {
