@@ -73,6 +73,7 @@
       </Disclosure>
 
      <router-view></router-view>
+     <Notification />
     </div>
   </template>
 
@@ -82,6 +83,7 @@
   import { useStore } from 'vuex';
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
+  import Notification from './Notification.vue';
 
 
 

@@ -19,7 +19,7 @@
     </template>
   </PageComponent>
   <div v-if="surveyLoading" class="flex justify-center text-zinc-800">Завантаження....</div>
-  <form v-else @submit.prevent="saveSurvey" method="post">
+  <form v-else @submit.prevent="saveSurvey" method="post" class="animate-fade-in-down">
 
    <pre> {{ model }} </pre>
     <div class="shadow sm:rounded-md sm:overflow-hidden">
@@ -238,7 +238,10 @@ function questionChange(question) {
 
 function saveSurvey() {
   store.dispatch("saveSurvey", model.value).then(({data}) => {
-
+    store.commit('notify', {
+      type: 'success',
+      message: 'Збережено',
+    });
     router.push({
       name: "SurveyView",
       params: { id: data.data.id },
