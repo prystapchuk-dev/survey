@@ -1,7 +1,7 @@
 <template>
   <div class="py-5 px-8">
     <div v-if="loading" class="flex justify-center">Завантаження...</div>
-    <form @submit="submitSurvey" v-else class="container mx-auto">
+    <form @submit.prevent="submitSurvey" v-else class="container mx-auto">
       <div class="grid grid-cols-6 items-center">
         <div class="mr-4">
           <img :src="survey.image_url" alt=""/>

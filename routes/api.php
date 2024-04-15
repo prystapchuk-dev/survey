@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SurveyController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,9 +27,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::resource('survey', SurveyController::class);
 
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
 });
 
 
 Route::get('/survey-by-slug/{survey:slug}', [SurveyController::class, 'showForGuest']);
+Route::post('/survey/{survey}/answer', [SurveyController::class, 'storeAnswer']);
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

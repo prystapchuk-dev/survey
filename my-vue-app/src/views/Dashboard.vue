@@ -1,7 +1,21 @@
 <template>
-    <PageComponent title="Dashboard">Content dashboard</PageComponent>
+    <PageComponent title="Dashboard">
+      <pre>{{ loading }}</pre>
+      <pre>{{ data }}</pre>
+    </PageComponent>
+    <pre>{{ loading }}</pre>
+      <pre>{{ data }}</pre>
 </template>
-  
+
   <script setup>
   import PageComponent from '../components/PageComponent.vue';
+  import { computed } from 'vue';
+  import { useStore } from 'vuex';
+
+  const store = useStore();
+
+  const loading = computed(() => store.state.dashboard.loading);
+  const data = computed(() => store.state.dashboard.data);
+
+  store.dispatch('getDashboardData');
   </script>
