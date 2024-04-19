@@ -134,15 +134,15 @@ const store = createStore({
   getters: {},
   actions: {
     getDashboardData({commit}) {
-      commit('dashboardLoading', true);
+      commit('setDashboardLoading', true);
       return axiosClient.get('/dashboard')
         .then((res) => {
-          commit('dashboardLoading', false);
+          commit('setDashboardLoading', false);
           commit('setDashboardData', res.data);
           return res;
         })
         .catch((err) => {
-          commit('dashboardLoading', false);
+          commit('setDashboardLoading', false);
           return err;
         })
     },

@@ -182,7 +182,7 @@ let model = ref({
 });
 
 watch(
-  () => store.state.currentSurvey.data.data,
+  () => store.state.currentSurvey.data,
   (newVal, oldVal) => {
 
     model.value = {
